@@ -29,6 +29,12 @@ class Windows(tk.Tk):
         self.text_window.configure(state="disabled")
         self.text_window.grid(column=0, row=1, sticky="we")
 
+        # Letter options for text window
+        self.text_window.tag_configure("default", font="Arial 12")
+        self.text_window.tag_configure("next", font="Arial 14 bold", foreground="pink")
+        self.text_window.tag_configure("correct", font="Arial 14 bold", foreground="green")
+        self.text_window.tag_configure("wrong", font="Arial 14 bold", foreground="red")
+
         # Text entry
         ttk.Label(self.mainframe, text="User input:").grid(column=0, row=2)
         self.user_input_window = ttk.Entry(self.mainframe, textvariable=self.user_input, width=35)
@@ -46,21 +52,10 @@ class Windows(tk.Tk):
         # Enable window
         self.text_window.configure(state="normal")
 
-        # Letter options
-        self.text_window.tag_configure("default", font="Arial 12")
-        self.text_window.tag_configure("next", font="Arial 14 bold", foreground="green")
-        self.text_window.tag_configure("correct", font="Arial 14 bold", foreground="green")
-        self.text_window.tag_configure("wrong", font="Arial 14 bold", foreground="red")
-
-
         # Insert default text, if empty, else update
-        if self.text_window.compare("end-1c", "==", "1.0"):
-            self.text_window.insert("end", self.text_to_type.get()[0], "next")
-            self.text_window.insert("end", self.text_to_type.get()[1:], "default")
-        else:
-            for count, char in enumerate(self.user_input.get()):
-                if char == self.text_to_type.get()[count]:
-                    pass
+        self.text_window.insert("end", self.text_to_type.get()[0], "next")
+        self.text_window.insert("end", self.text_to_type.get()[1:], "default")
+        
         # Disable window
         self.text_window.configure(state="disabled")
 
@@ -68,13 +63,51 @@ class Windows(tk.Tk):
     def check_text(self, *args):
         """Check user input."""
 
+        # Enable window
+        self.text_window.configure(state="normal")
+
+        # Update text window
+        for count, char in enumerate(self.user_input.get()):
+
+            # Check if finished typing
+            if count < len(self.text_to_type.get())-1:
+                # Delete actual character for update
+                self.text_window.delete(f"1.{count}", f"1.{count+2}")
+
+                # Evaluate user input and insert result 
+                if char == self.text_to_type.get()[count]: 
+                    self.text_window.insert(f"1.{count}", char, "correct")
+                else:
+                    self.text_window.insert(f"1.{count}", self.text_to_type.get()[count], "wrong")
+
+                # Highlight next character
+                self.text_window.insert(f"1.{count+1}", self.text_to_type.get()[count+1], "next")
+                self.text_window.delete(f"1.{count+2}", "end")
+                self.text_window.insert(f"1.{count+2}", self.text_to_type.get()[count+2:], "default")
+            elif count == len(self.text_to_type.get())-1:
+                # Delete actual character for update
+                self.text_window.delete(f"1.{count}", "end")
+
+                # Evaluate user input and insert result 
+                if char == self.text_to_type.get()[count]: 
+                    self.text_window.insert(f"1.{count}", char, "correct")
+                    self.text_window.insert("end", "\n\nFinished", "default")
+                else:
+                    self.text_window.insert(f"1.{count}", self.text_to_type.get()[count], "wrong")
+            else:
+                self.text_window.insert("end", char, "wrong")
+                
+
+        # Disable window
+        self.text_window.configure(state="disabled")
+
 
 
 def main():
     """Main function"""
     app = Windows()
     app.show_text_to_type()
-    app.user_input.trace_add("write", app.show_text_to_type)
+    app.user_input.trace_add("write", app.check_text)
     app.mainloop()
 
 
