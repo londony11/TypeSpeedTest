@@ -49,28 +49,32 @@ class Windows(tk.Tk):
         # Letter options
         self.text_window.tag_configure("default", font="Arial 12")
         self.text_window.tag_configure("next", font="Arial 14 bold", foreground="green")
-        self.text_window.tag_configure("correct", font="Arial 12", background="green")
+        self.text_window.tag_configure("correct", font="Arial 14 bold", foreground="green")
+        self.text_window.tag_configure("wrong", font="Arial 14 bold", foreground="red")
 
-        # Insert default text
-        self.text_window.insert("end", self.text_to_type.get()[0], "next")
-        self.text_window.insert("end", self.text_to_type.get()[1:], "default")
 
+        # Insert default text, if empty, else update
+        if self.text_window.compare("end-1c", "==", "1.0"):
+            self.text_window.insert("end", self.text_to_type.get()[0], "next")
+            self.text_window.insert("end", self.text_to_type.get()[1:], "default")
+        else:
+            for count, char in enumerate(self.user_input.get()):
+                if char == self.text_to_type.get()[count]:
+                    pass
         # Disable window
         self.text_window.configure(state="disabled")
 
 
-    def check_text(self):
+    def check_text(self, *args):
         """Check user input."""
-        for count, char in enumerate(self.user_input.get()):
-            if char == self.text_to_type.get()[count]:
-                print("Hello")
+
 
 
 def main():
     """Main function"""
     app = Windows()
     app.show_text_to_type()
-    app.check_text()
+    app.user_input.trace_add("write", app.show_text_to_type)
     app.mainloop()
 
 
