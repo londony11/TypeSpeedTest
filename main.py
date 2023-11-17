@@ -23,6 +23,8 @@ class Windows(tk.Tk):
         self.user_input = tk.StringVar()
         self.t0 = time.time()
         self.t1 = self.t0
+        self.cpm = 0
+        self.wpm = 0
 
         # Title
         self.title("Type speed test")
@@ -72,7 +74,7 @@ class Windows(tk.Tk):
 
     def check_text(self, *args):
         """Check user input."""
-
+        
         # Start timer
         if self.t0 == self.t1:
             self.t0 = time.time()
@@ -109,8 +111,11 @@ class Windows(tk.Tk):
                 # Evaluate user input and insert result
                 if char == self.text_to_type.get()[count]:
                     self.text_window.insert(f"1.{count}", char, "correct")
-                    self.text_window.insert("end", "\n\nFinished", "default")
                     self.t1 = time.time()
+                    self.cpm = round(len(self.text_to_type.get()) / ((self.t1 - self.t0) / 60))
+                    self.wpm = round(self.cpm / 5)
+                    self.text_window.insert("end", f"\n\nFinished: CPM:{self.cpm}, WPM:{self.wpm}", "default")
+
                 else:
                     self.text_window.insert(f"1.{count}", self.text_to_type.get()[count], "wrong")
             else:
