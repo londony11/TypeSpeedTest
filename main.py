@@ -1,18 +1,28 @@
 """TypeSpeedTest Desktop App"""
 import tkinter as tk
 from tkinter import ttk
+import time
 from data import EXAMPLE
 
 
 class Windows(tk.Tk):
     """Application class."""
 
-
-    def __init__(self, screenName: str | None = None, baseName: str | None = None, className: str = "Tk", useTk: bool = True, sync: bool = False, use: str | None = None) -> None:
+    def __init__(
+        self,
+        screenName: str | None = None,
+        baseName: str | None = None,
+        className: str = "Tk",
+        useTk: bool = True,
+        sync: bool = False,
+        use: str | None = None
+        ) -> None:
         super().__init__(screenName, baseName, className, useTk, sync, use)
 
         self.text_to_type = tk.StringVar(value=EXAMPLE)
         self.user_input = tk.StringVar()
+        self.t0 = time.time()
+        self.t1 = self.t0
 
         # Title
         self.title("Type speed test")
@@ -55,13 +65,17 @@ class Windows(tk.Tk):
         # Insert default text, if empty, else update
         self.text_window.insert("end", self.text_to_type.get()[0], "next")
         self.text_window.insert("end", self.text_to_type.get()[1:], "default")
-        
+
         # Disable window
         self.text_window.configure(state="disabled")
 
 
     def check_text(self, *args):
         """Check user input."""
+
+        # Start timer
+        if self.t0 == self.t1:
+            self.t0 = time.time()
 
         # Enable window
         self.text_window.configure(state="normal")
@@ -74,8 +88,8 @@ class Windows(tk.Tk):
                 # Delete actual character for update
                 self.text_window.delete(f"1.{count}", f"1.{count+2}")
 
-                # Evaluate user input and insert result 
-                if char == self.text_to_type.get()[count]: 
+                # Evaluate user input and insert result
+                if char == self.text_to_type.get()[count]:
                     self.text_window.insert(f"1.{count}", char, "correct")
                 else:
                     self.text_window.insert(f"1.{count}", self.text_to_type.get()[count], "wrong")
@@ -83,20 +97,25 @@ class Windows(tk.Tk):
                 # Highlight next character
                 self.text_window.insert(f"1.{count+1}", self.text_to_type.get()[count+1], "next")
                 self.text_window.delete(f"1.{count+2}", "end")
-                self.text_window.insert(f"1.{count+2}", self.text_to_type.get()[count+2:], "default")
+                self.text_window.insert(
+                    f"1.{count+2}",
+                    self.text_to_type.get()[count+2:],
+                    "default"
+                    )
             elif count == len(self.text_to_type.get())-1:
                 # Delete actual character for update
                 self.text_window.delete(f"1.{count}", "end")
 
-                # Evaluate user input and insert result 
-                if char == self.text_to_type.get()[count]: 
+                # Evaluate user input and insert result
+                if char == self.text_to_type.get()[count]:
                     self.text_window.insert(f"1.{count}", char, "correct")
                     self.text_window.insert("end", "\n\nFinished", "default")
+                    self.t1 = time.time()
                 else:
                     self.text_window.insert(f"1.{count}", self.text_to_type.get()[count], "wrong")
             else:
                 self.text_window.insert("end", char, "wrong")
-                
+
 
         # Disable window
         self.text_window.configure(state="disabled")
