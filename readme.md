@@ -8,8 +8,6 @@ The Python Type Speed Test is a typing speed assessment tool with a graphical us
 - [Requirements](#requirements)
 - [Usage](#usage)
 - [Customization](#customization)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 This repository contains the source code for a typing speed test developed in Python, featuring a graphical user interface (GUI) built using Tkinter. The tool is designed to assist in assessing and improving typing speed by presenting passages for typing within a set time frame.
